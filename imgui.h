@@ -1713,6 +1713,7 @@ struct ImGuiTextFilter
     char                InputBuf[256];
     ImVector<ImGuiTextRange> Filters;
     int                 NegativeFilterCount;
+    bool                ShowSettings;
 
     // [Configuration]
     ImGuiTextFilterMode MatchMode;      // if true then all words must match, otherwise any matching word will be a pass

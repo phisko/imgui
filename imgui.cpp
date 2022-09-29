@@ -2047,6 +2047,7 @@ ImGuiTextFilter::ImGuiTextFilter(const char* default_filter)
     : MatchMode(ImGuiTextFilterMode_Or)
     , WordSplitter(',')
     , MinWordSize(0)
+    , ShowSettings(false)
 {
     if (default_filter)
     {
@@ -2061,11 +2062,36 @@ ImGuiTextFilter::ImGuiTextFilter(const char* default_filter)
 
 bool ImGuiTextFilter::Draw(const char* label, float width)
 {
+    ImGui::PushID(this);
+    const ImGuiDir ArrowDirection = ShowSettings ? ImGuiDir_Down : ImGuiDir_Right;
+    if (ImGui::ArrowButton("Settings", ArrowDirection))
+        ShowSettings = !ShowSettings;
+    if (ImGui::IsItemHovered())
+        ImGui::SetTooltip("Filter settings");
+    ImGui::PopID();
+
+    ImGui::SameLine();
+
     if (width != 0.0f)
         ImGui::SetNextItemWidth(width);
     bool value_changed = ImGui::InputText(label, InputBuf, IM_ARRAYSIZE(InputBuf));
     if (value_changed)
         Build();
+
+    if (ShowSettings)
+    {
+        ImGui::TreePush(this);
+        const char *modes[] = {"Or", "And"};
+        ImGui::Combo("Match mode", &MatchMode, modes, 2);
+
+        char buff[2] = {WordSplitter, 0};
+        ImGui::InputText("Word splitter", buff, sizeof(buff));
+        WordSplitter = buff[0];
+
+        ImGui::InputScalar("Min word size", ImGuiDataType_S8, &MinWordSize);
+        ImGui::TreePop();
+    }
+
     return value_changed;
 }
 
